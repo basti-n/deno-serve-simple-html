@@ -1,0 +1,9 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#302D27",
+    "titleBar.activeBackground": "#433F37",
+    "titleBar.activeForeground": "#FBFBFA"
+  },
+  "deno.enable": true
+}
