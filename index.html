@@ -3,9 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML served with Deno</title>
+    <title>Chat using Deno</title>
 </head>
 <body>
-    <h1>Serve HTML with Deno</h1>
+    <h1>Chat with Deno</h1>
+    <div id="app"></div>
+    <script type="module">
+        import { html, render, useEffect, useState } from 'https://unpkg.com/htm/preact/standalone.module.js'
+
+        let ws;
+
+        function Chat() {
+            const [messages, setMessage] = useState([]);
+            const onReceiveMessage = ({ data }) => setMessage((messages) => [...messages, data]);
+            const onSendMessage = (event) => {
+                event.preventDefault();
+                const message = event.target[0].value;
+                if(!message) {return};
+
+                ws.send(message);
+                event.target[0].value = '';
+            }
+
+            useEffect(() => {
+                if(ws) {
+                    ws.close()
+                }
+
+                ws = new WebSocket(`ws://${window.location.host}/ws`);
+                ws.addEventListener('message', onReceiveMessage);
+
+                return () => {
+                    ws.removeEventListener('message', onReceiveMessage)
+                }
+            }, [])
+
+            return html`
+                ${messages.map(message => html`
+                        <div>${message}</div>
+                    `)}
+                
+                <form onSubmit=${onSendMessage}>
+                    <input type="text" />
+                    <button>Send</button>
+                </form>
+            `
+        }
+
+        render(html`<${ Chat } />`, document.getElementById('app'))
+    </script>
 </body>
 </html>
