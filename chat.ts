@@ -3,11 +3,14 @@ import {
     isWebSocketCloseEvent,
   } from "https://deno.land/std/ws/mod.ts";
   import { v4 } from "https://deno.land/std/uuid/mod.ts";
+  import { camelize } from './utils/camelize.ts';
 
   const users = new Map<string, WebSocket>();
 
   function broadcast(message: string, senderId?: string) {
       if(!message) {return}
+
+      debugger;
 
       for (const user of users.values()) {
           user.send(senderId ? `${senderId}: ${message}` : message)
@@ -21,7 +24,9 @@ import {
       broadcast(`> User with id ${userId} is connected.`);
 
       for await (const event of ws) {
-          const message = typeof event === 'string' ? event : '';
+          const message = typeof event === 'string' 
+            ? camelize(event) 
+            : '';
 
           broadcast(message, userId);
 
